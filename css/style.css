@@ -19,7 +19,7 @@ input, a, button, textarea {
 .header .p-item {
   float: left;
   margin-right: 5px;
-  padding: 20px 20px;
+  padding: 18px 20px;
   cursor: pointer;
   border-bottom: 2px solid #fff;
   transition: all 0.2s ease-out;
@@ -30,6 +30,63 @@ input, a, button, textarea {
   border-bottom-color: #88beff; }
 .header .p-item.active {
   border-bottom-color: #006cee; }
+
+.panel {
+  padding: 0 10px; }
+
+.section .title {
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: 400;
+  padding: 0 15px;
+  color: #3A3A4F;
+  border-left: 5px solid #3A3A4F;
+  border-radius: 4px; }
+.section .s-cont {
+  margin-top: 10px;
+  font-size: 14px; }
+.section .label {
+  color: #666;
+  margin-bottom: 5px; }
+.section .form-text {
+  display: block;
+  margin-bottom: 5px;
+  width: 500px;
+  max-width: 500px;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s ease-out;
+  -moz-transition: border-color 0.2s ease-out;
+  -webkit-transition: border-color 0.2s ease-out;
+  -o-transition: border-color 0.2s ease-out; }
+.section .form-text:focus {
+  border-color: #3A3A4F; }
+.section .btn {
+  display: inline-block;
+  margin: 5px 0;
+  padding: 7px 30px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #fff;
+  border: 1px solid #0055bb;
+  border-radius: 2px;
+  background-color: #006cee;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  -webkit-transition: all 0.2s ease-out;
+  -o-transition: all 0.2s ease-out; }
+.section .btn:hover {
+  border: 1px solid #006cee;
+  background-color: #0978ff; }
+.section .btn:active {
+  border: 1px solid #0055bb;
+  background-color: #0060d5; }
+.section .pre {
+  font-family: inherit; }
 
 .clearfix {
   *zoom: 1; }

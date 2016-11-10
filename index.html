@@ -16,12 +16,21 @@
 		</div>
 		<div class="container">
 			<div class="panel" id="panel1">
-				
+				<div class="section">
+					<h2 class="title">加密</h2>
+					<div class="s-cont">
+						<p class="label">明文：</p>
+						<textarea class="form-text" rows="3" placeholder="输入需要加密的内容（英文）" id="input1-1"></textarea>
+						<p class="label">密钥：</p>
+						<input type="number" class="form-text" placeholder="输入偏移量（数字）" id="input1-2" />
+						<button class="btn btn-default" id="submit1-1">生成密文</button>
+						<p class="label">密文：</p>
+						<pre class="result" id="result1-1">-</pre>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-	
-
 	<script src="./js/index.js"></script>
 </body>
 </html>
