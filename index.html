@@ -10,12 +10,13 @@
 		<div class="header">
 			<ul class="project-list clearfix">
 				<li class="p-item active" data-target="#panel1">凯撒密码</li>
-				<li class="p-item">playfair</li>
+				<li class="p-item" data-target="#panel2">playfair</li>
 				<li class="p-item">hill密码算法</li>
 			</ul>
 		</div>
 		<div class="container">
-			<div class="panel" id="panel1">
+			<!-- Caesar -->
+			<div class="panel clearfix open" id="panel1">
 				<div class="section">
 					<h2 class="title">加密</h2>
 					<div class="s-cont">
@@ -28,6 +29,61 @@
 						<pre class="result" id="result1-1">-</pre>
 					</div>
 				</div>
+			</div>
+			<!-- playfiar -->
+			<div class="panel clearfix" id="panel2">
+				<div class="section">
+					<h2 class="title">加密</h2>
+					<div class="s-cont">
+						<p class="label">明文：</p>
+						<textarea class="form-text" rows="3" placeholder="输入需要加密的内容（英文）" id="input2-1"></textarea>
+						<p class="label">密钥：</p>
+						<input type="text" class="form-text" placeholder="输入加密密钥" id="input2-2" />
+						<button class="btn btn-default" id="submit2-1">生成密文</button>
+						<p class="label">字母矩阵：</p>
+						<ul id="letterMatrix" class="clearfix">
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+							<li></li>
+						</ul>
+						<p class="label">密文：</p>
+						<pre class="result" id="result2-1">-</pre>
+
+					</div>
+				</div>
+				<div class="section">
+					<h2 class="title">解密</h2>
+					<div class="s-cont">
+						<p class="label">密文：</p>
+						<textarea class="form-text" rows="3" placeholder="输入需要解密的内容（英文）" id="input2-3"></textarea>
+						<button class="btn btn-default" id="submit2-2">生成明文</button>
+						<p class="label">明文：</p>
+						<pre class="result" id="result2-2">-</pre>
+					</div>
+				</div>
+
 			</div>
 		</div>
 	</div>
