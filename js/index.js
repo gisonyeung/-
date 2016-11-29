@@ -108,11 +108,7 @@
 		// 还没生成过 hill 对象
 		if ( !hill ) {
 
-			// 传入密钥
-			hill = new Hill(content[0]);
-			// 获取密钥对应的字母矩阵二维数组，并绘制为 DOM
-			drawLetterMatrix('#codeMatrix1', hill.getSKMatrix().one);
-			drawLetterMatrix('#codeMatrix2', hill.getSKMatrix().one);
+			$('#submit3-1').click();
 
 		} else {
 		
@@ -123,6 +119,39 @@
 		}
 
 	};
+
+	/* hill 密码 生成逆矩阵 */
+	$('#submit3-3').onclick = function() {
+
+		// 还没生成过 hill 对象
+		if ( !hill ) {
+			
+			$('#submit3-1').click();
+
+		}
+
+		drawLetterMatrix('#codeMatrix3', hill.getInverseMartrix().one);
+		
+	};
+
+	/* hill 密码 生成明文 */
+	$('#submit3-4').onclick = function() {
+
+		// 还没生成过 hill 对象
+		if ( !hill ) {
+			return false;
+		}
+
+		var content = getText('#input3-3');  
+
+		var _plainText = hill.decrypt(content[0]); // 传入明文
+		setText('#result3-2', _plainText);
+		
+	};
+
+
+
+
 
 
 
@@ -532,6 +561,43 @@
 			};
 		};
 
+		this.inverseMartrix = $M( this.getSKMatrix().two ).inverse();
+
+		this.getInverseMartrix = function() {
+
+			var one = []
+				two = [];
+
+			this.inverseMartrix.elements.forEach(function(row) {
+			row.forEach(function(val, index) {
+					one.push(val.toFixed(2));
+				});
+			});
+
+			var row = 0, col = 0;
+			one.forEach(function(val, index) {
+
+				if ( col == 0 ) {
+					two[row] = [];
+				}
+
+				two[row].push(val);
+				col++;
+
+				if ( col == 3 ) {
+					col = 0;
+					row++;
+				}
+
+			});
+
+			return {
+				one: one,
+				two: two,
+			};
+
+		},
+
 		this.encrypt = function(plaintext) {
 
 			plaintext = plaintext
@@ -574,6 +640,53 @@
 			return cipherText;
 
 		};
+
+		this.decrypt = function(cipherText) {
+
+			cipherText = cipherText
+						.toUpperCase()
+						.replace(/\s/g, "");
+
+			var cipherTextLen = cipherText.length,
+				plainText = ''; // 明文
+
+			// 明文格式验证
+			if ( !cipherTextLen ) {
+				return '密文不能为空';
+			} else if ( /[^A-Za-z\s]/g.test(cipherText) ) {
+				return '密文只能由字母组成';
+			}
+
+			// 密钥矩阵
+			var SKMatrix = this.getSKMatrix().two;
+			// 密文分组，二维数组
+			var group = this.createGroup(cipherText).two;
+
+			var K_inverse = this.inverseMartrix;
+			var P = $M(group);
+
+			var rowsLen = P.rows(),
+				plainMatrix = [];
+
+			for ( var i = 1; i <= rowsLen; i++ ) {
+				plainMatrix.push(K_inverse.x( $M(P.row(i)) ));
+			}
+
+			console.log(plainMatrix);
+
+			plainMatrix.forEach(function(row) {
+
+				row.elements.forEach(function(val, index) {
+					plainText += String.fromCharCode( val % 26 + 65 );
+				});
+
+			});
+
+			return plainText;
+
+		};
+
+
 
 
 
