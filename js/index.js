@@ -18,50 +18,7 @@
 
 	};
 
-
-
-	/*
-		凯撒密码
-		@description 根据加密内容和口令加密
-		@param { String } plaintext 明文
-		@param { number-like String } key 偏移量
-		@return { String } 密文
-	*/
-	function caesar(plaintext, key) {
-
-		var _result = '';
-
-		key = parseInt(key, 10) % 26; // 防止超出26
-
-		// 去除空格
-		plaintext = plaintext.replace(/\s/, '');
-
-		for (var i = 0; i < plaintext.length; i++) {
-
-			var _char = plaintext[i].charCodeAt();
-
-			if ( _char >= 97 && _char <= 123 ) { // 小写变大写
-
-				var _charToSecret = 65 + (_char + key) % 97 % 26;
-				_result += String.fromCharCode(_charToSecret);
-
-			} else if ( _char >= 65 && _char <= 91 ) { // 大写变小写
-
-				var _charToSecret = 97 + (_char + key) % 65 % 26;
-				_result += String.fromCharCode(_charToSecret);
-
-			} else { // 不是字母则原样输出
-				_result += plaintext[i];
-			}
-
-		}
-
-		return _result;
-
-	}
-
-
-	/* 凯撒密码 生成密文 */
+	/* playfiar密码 生成密文 */
 	$('#submit2-1').onclick = function() {
 
 		var content = getText('#input2-1', '#input2-2');  
@@ -90,7 +47,7 @@
 
 	};
 
-	/* 凯撒密码 生成明文 */
+	/* playfiar密码 生成明文 */
 	$('#submit2-2').onclick = function() {
 
 		var content = getText('#input2-3', '#input2-4');  
@@ -131,6 +88,48 @@
 		});
 
 		$letterMatrix_ul.innerHTML = _html;
+	}
+
+
+
+	/*
+		凯撒密码
+		@description 根据加密内容和口令加密
+		@param { String } plaintext 明文
+		@param { number-like String } key 偏移量
+		@return { String } 密文
+	*/
+	function caesar(plaintext, key) {
+
+		var _result = '';
+
+		key = parseInt(key, 10) % 26; // 防止超出26
+
+		// 去除空格
+		plaintext = plaintext.replace(/\s/, '');
+
+		for (var i = 0; i < plaintext.length; i++) {
+
+			var _char = plaintext[i].charCodeAt();
+
+			if ( _char >= 97 && _char <= 123 ) { // 小写变大写
+
+				var _charToSecret = 65 + (_char + key) % 97 % 26;
+				_result += String.fromCharCode(_charToSecret);
+
+			} else if ( _char >= 65 && _char <= 91 ) { // 大写变小写
+
+				var _charToSecret = 97 + (_char + key) % 65 % 26;
+				_result += String.fromCharCode(_charToSecret);
+
+			} else { // 不是字母则原样输出
+				_result += plaintext[i];
+			}
+
+		}
+
+		return _result;
+
 	}
 
 
