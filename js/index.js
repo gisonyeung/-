@@ -144,8 +144,12 @@
 
 		var content = getText('#input3-3');  
 
+		if ( !content[0] ) {
+			return false;
+		}
+
 		var _plainText = hill.decrypt(content[0]); // 传入明文
-		setText('#result3-2', _plainText);
+		setText('#result3-2', $('#input3-2').value.toUpperCase() || '-');
 		
 	};
 
