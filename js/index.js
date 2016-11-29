@@ -76,6 +76,56 @@
 
 	};
 
+	/* hill 密码 生成密钥矩阵 */
+	var hill;
+	$('#submit3-1').onclick = function() {
+
+		var content = getText('#input3-1');  
+
+		if ( !content[0] || content[0] < 26 ) {
+			$('#input3-1').value = 26;
+		} else if ( content[0] > 50 ) {
+			$('#input3-1').value = 50;
+		}
+
+		hill = new Hill(content[0]); // 传入密钥
+
+		// 获取密钥对应的字母矩阵二维数组，并绘制为 DOM
+		drawLetterMatrix('#codeMatrix1', hill.getSKMatrix().one);
+		drawLetterMatrix('#codeMatrix2', hill.getSKMatrix().one);
+
+		// var _cipherText = hill.encrypt(content[1]); // 传入明文
+
+		setText('#result3-1', '-');
+
+	};
+
+	/* hill 密码 生成密文 */
+	$('#submit3-2').onclick = function() {
+
+		var content = getText('#input3-1', '#input3-2');  
+
+		// 还没生成过 hill 对象
+		if ( !hill ) {
+
+			// 传入密钥
+			hill = new Hill(content[0]);
+			// 获取密钥对应的字母矩阵二维数组，并绘制为 DOM
+			drawLetterMatrix('#codeMatrix1', hill.getSKMatrix().one);
+			drawLetterMatrix('#codeMatrix2', hill.getSKMatrix().one);
+
+		} else {
+		
+			var _cipherText = hill.encrypt(content[1]); // 传入明文
+
+			setText('#result3-1', _cipherText);
+
+		}
+
+	};
+
+
+
 	function drawLetterMatrix(selector, letterMatrix) {
 		var $letterMatrix_ul = $(selector);
 
@@ -89,7 +139,6 @@
 
 		$letterMatrix_ul.innerHTML = _html;
 	}
-
 
 
 	/*
@@ -378,13 +427,157 @@
 			return plaintext;
 		}
 
-
-
 		return this;
 
 	}
 
 
+	/*
+		hill 密码
+		@description 根据加密内容和口令加密
+		@用法：
+
+		var playfiar = new Playfir('code') // 传入密钥
+		var _cipherText = '',
+			letterMatrix;
+
+		if ( playfiar.error ) { // 密钥格式错误则会返回错误原因
+			_cipherText = playfiar.error;
+		} else {
+
+			// 获取密钥对应的字母矩阵一维数组 length:25
+			letterMatrix = playfiar.getLetterMatrix(); 
+
+			_cipherText = playfiar.encrypt('test'); // 传入明文
+		}
+
+		// todo with `letterMatrix` & `_ciphertext`
+	*/
+	function Hill(secretKeyRange) {
+
+		secretKeyRange = parseInt(secretKeyRange, 10) || 26;
+
+		if ( secretKeyRange > 50 ) {
+			secretKeyRange = 50;
+		} else if ( secretKeyRange < 26 ) {
+			secretKeyRange = 26;
+		}
+
+		this.createSKMatrix = function(secretKeyRange) {
+			var one = [], // 一维表示
+				two = []; // 二维表示
+
+			for( var i = 0; i < 3; i++ ) {
+				two[i] = [];
+		        for( var j = 0; j < 3; j++ ) {
+		        	var _random = 1 + Math.round(Math.random() * (secretKeyRange - 1));
+		            one.push(_random);
+		            two[i][j] = _random;
+		        }
+		    }
+
+		    return {
+		    	one: one,
+		    	two: two,
+		    }
+		};
+
+		this.SKMatrix = this.createSKMatrix(secretKeyRange);
+
+		this.getSKMatrix = function() {
+			return this.SKMatrix;
+		};
+
+		this.createGroup = function(plaintext) {
+			plaintext = plaintext
+						.toUpperCase()
+						.replace(/\s/g, "");
+
+			var plaintextLen = plaintext.length;
+			var one = [], // 一维表示
+				two = []; // 二维表示
+
+			// 处理明文并存入 one
+			for ( var i = 0; i < plaintextLen; i++ )  {
+				one.push(plaintext.charCodeAt(i) - 65);
+			}
+
+			if (one.length % 3 == 1) { // 判断最后一组是否只有1个字母
+				one.push(23);
+				one.push(23);
+			} else if (one.length % 3 == 2) { // 判断最后一组是否只有2个字母
+				one.push(23);
+			}
+
+			var row = 0, col = 0;
+			one.forEach(function(val, index) {
+
+				if ( col == 0 ) {
+					two[row] = [];
+				}
+
+				two[row].push(val);
+				col++;
+
+				if ( col == 3 ) {
+					col = 0;
+					row++;
+				}
+
+			});
+
+			return {
+				one: one,
+				two: two,
+			};
+		};
+
+		this.encrypt = function(plaintext) {
+
+			plaintext = plaintext
+						.toUpperCase()
+						.replace(/\s/g, "");
+
+			var plaintextLen = plaintext.length,
+				cipherText = ''; // 密文
+
+			// 明文格式验证
+			if ( !plaintextLen ) {
+				return '明文不能为空';
+			} else if ( /[^A-Za-z\s]/g.test(plaintext) ) {
+				return '明文只能由字母组成';
+			}
+
+			// 密钥矩阵
+			var SKMatrix = this.getSKMatrix().two;
+			// 明文分组，二维数组
+			var group = this.createGroup(plaintext).two;
+
+			var K = $M(SKMatrix);
+			var P = $M(group);
+
+			var rowsLen = P.rows(),
+				cipherMatrix = [];
+
+			for ( var i = 1; i <= rowsLen; i++ ) {
+				cipherMatrix.push(K.x( P.row(i) ));
+			}
+
+			cipherMatrix.forEach(function(row) {
+
+				row.elements.forEach(function(val, index) {
+					cipherText += String.fromCharCode( val % 26 + 65 );
+				});
+
+			});
+
+			return cipherText;
+
+		};
+
+
+
+	}
 
 
 
