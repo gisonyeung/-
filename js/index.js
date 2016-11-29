@@ -139,18 +139,21 @@
 		@用法：
 
 		var playfiar = new Playfir('code') // 传入密钥
+		var _cipherText = '',
+			letterMatrix;
 
-		if ( playfiar.error ) { // 密文格式错误则会返回错误原因
-			alert(playfiar.error);
+		if ( playfiar.error ) { // 密钥格式错误则会返回错误原因
+			_cipherText = playfiar.error;
 		} else {
 
 			// 获取密钥对应的字母矩阵一维数组 length:25
-			playfiar.getLetterMatrix(); 
+			letterMatrix = playfiar.getLetterMatrix(); 
 
-			var _cipherText = playfiar.encrypt('test'); // 传入明文
-
-			// todo with ciphertext
+			_cipherText = playfiar.encrypt('test'); // 传入明文
 		}
+
+		// todo with `letterMatrix` & `_ciphertext`
+
 	*/
 	var Playfiar = function(secretKey) {
 
