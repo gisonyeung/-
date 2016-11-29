@@ -105,12 +105,12 @@ input, a, button, textarea {
   -webkit-transition: all 0.2s ease-out;
   -o-transition: all 0.2s ease-out; }
 
-#letterMatrix {
+.letterMatrix {
   margin-bottom: 4px;
   max-width: 255px;
   border: 1px solid #ccc;
   border-width: 0 0 1px 1px; }
-#letterMatrix li {
+.letterMatrix li {
   float: left;
   width: 50px;
   height: 50px;

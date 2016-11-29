@@ -70,14 +70,14 @@
 
 		var _cipherText = '';
 
-		if ( playfiar.error ) { // 密文格式错误则会返回错误原因
+		if ( playfiar.error ) { // 密钥格式错误则会返回错误原因
 
 			_cipherText = playfiar.error;
 
 		} else {
 
 			// 获取密钥对应的字母矩阵二维数组，并绘制为 DOM
-			drawLetterMatrix(playfiar.getLetterMatrix());
+			drawLetterMatrix('#letterMatrix1', playfiar.getLetterMatrix());
 
 			_cipherText = playfiar.encrypt(content[0]); // 传入明文
 
@@ -90,8 +90,37 @@
 
 	};
 
-	function drawLetterMatrix(letterMatrix) {
-		var $letterMatrix_ul = $('#letterMatrix');
+	/* 凯撒密码 生成明文 */
+	$('#submit2-2').onclick = function() {
+
+		var content = getText('#input2-3', '#input2-4');  
+
+		var playfiar = new Playfiar(content[1]); // 传入密钥
+
+		var _plainText = '';
+
+		if ( playfiar.error ) { // 密钥格式错误则会返回错误原因
+
+			_plainText = playfiar.error;
+
+		} else {
+
+			// 获取密钥对应的字母矩阵二维数组，并绘制为 DOM
+			drawLetterMatrix('#letterMatrix2', playfiar.getLetterMatrix());
+
+			_plainText = playfiar.decrypt(content[0]); // 传入密文
+
+		}
+
+		setText('#result2-2', _plainText);
+
+		// 释放对象
+		playfiar = null;
+
+	};
+
+	function drawLetterMatrix(selector, letterMatrix) {
+		var $letterMatrix_ul = $(selector);
 
 		var letterMatrix_li_tpl = '<li>{{letter}}</li>';
 
@@ -266,6 +295,85 @@
 			// 返回密文
 			return cipherText;
 
+		}
+
+		// 根据密文生成明文
+		this.decrypt = function(cipherText) {
+
+			cipherText = cipherText
+						.toUpperCase()
+						.replace(/\s/g, "");
+
+			var cipherTextLen = cipherText.length,
+				textGroup = '', // 用于记录分组明文
+				plaintext = ''; // 明文
+
+			// 密文格式验证
+			if ( !cipherTextLen || /[^A-IK-Za-ik-z\s]/g.test(cipherText) ) {
+				return '密文不合法';
+			}
+			
+			var letterMatrix = this.getLetterMatrix();			
+
+			//转换明文
+			var letterA, letterB, remainderA, remainderB, discussA, discussB;
+			for (i = 0; i < cipherTextLen; i += 2) {
+				letterA = letterMatrix.indexOf(cipherText[i]);
+				letterB = letterMatrix.indexOf(cipherText[i + 1]);
+				remainderA = letterA % 5;
+				remainderB = letterB % 5;
+				discussA = Math.floor(letterA / 5);
+				discussB = Math.floor(letterB / 5);
+				if (discussA == discussB) {
+					//如果密文字母在矩阵中同行，则
+					letterA--;
+					letterB--;
+					if ((letterA + 1) % 5 == 0) {
+						letterA += 5;
+					}
+					if ((letterB + 1) % 5 == 0) {
+						letterB += 5;
+					}
+					textGroup = textGroup + letterMatrix[letterA] + letterMatrix[letterB];
+					continue;
+				} else if (remainderA == remainderB) {
+					//如果密文字母在矩阵中同列，则
+					letterA -= 5;
+					letterB -= 5;
+					if (letterA < 0) {
+						letterA += 25;
+					}
+					if (letterB < 0) {
+						letterB += 25;
+					}
+					textGroup = textGroup + letterMatrix[letterA] + letterMatrix[letterB];
+					continue;
+				} else {
+					//如果密文字母在矩阵中既不同行又不同列，则
+					letterA = letterA - remainderA + remainderB;
+					letterB = letterB - remainderB + remainderA;
+					textGroup = textGroup + letterMatrix[letterA] + letterMatrix[letterB];
+				}
+			}
+
+			//去“K”
+			var textGroupLen = textGroup.length;
+			for (i = 0; i < (textGroupLen - 2); i += 2) {
+				if (textGroup[i] == textGroup[i + 2] && textGroup[i + 1] == 'K') {
+					plaintext = plaintext + textGroup[i];
+				} else {
+					plaintext = plaintext + textGroup[i] + textGroup[i + 1];
+				}
+			}
+			if (textGroup[i] != 'K' && textGroup[i + 1] == 'K') { //末尾处理
+				plaintext = plaintext + textGroup[i] + "(K)";
+			} else if (textGroup[i] == 'K' && textGroup[i + 1] == 'K') {
+				plaintext = plaintext + textGroup[i];
+			} else {
+				plaintext = plaintext + textGroup[i] + textGroup[i + 1];
+			}
+
+			return plaintext;
 		}
 
 
