@@ -672,7 +672,7 @@
 				plainMatrix.push(K_inverse.x( $M(P.row(i)) ));
 			}
 
-			console.log(plainMatrix);
+			// console.log(plainMatrix);
 
 			plainMatrix.forEach(function(row) {
 
@@ -685,10 +685,6 @@
 			return plainText;
 
 		};
-
-
-
-
 
 	}
 
