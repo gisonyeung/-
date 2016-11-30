@@ -182,9 +182,17 @@
 		// [p, q, n, $n]
 		var result = rsa.setPairPrimeNum(content[0], content[1]);
 
+		// 重复按钮
+		if ( !result ) {
+			return false;
+		}
+
+		// 质数不符合条件
 		if (result.error) {
 			setText('#result4-1', result.error);
 			setText('#result4-2', '-');
+			// 重置公钥相关信息
+			resetPublicMsg()
 			return false;
 		}
 
@@ -192,6 +200,9 @@
 		setValue('#input4-2', result[1] || '');
 		setText('#result4-1', result[2] || '-');
 		setText('#result4-2', result[3] || '-');
+
+		// 重置公钥相关信息
+		resetPublicMsg();
 		
 	};
 
@@ -210,6 +221,39 @@
 		setValue('#input4-2', result[1] || '');
 		setText('#result4-1', result[2] || '-');
 		setText('#result4-2', result[3] || '-');
+
+		// 重置公钥相关信息
+		resetPublicMsg();
+	};
+
+	/* RSA 使用该公钥 */
+	$('#submit4-2-1').onclick = function() {
+
+		// 还没生成过 rsa 对象
+		if ( !rsa ) {
+			return false;			
+		}
+
+		var content = getText('#input4-3');  
+
+		// { error, e d, publicKey, privateKey }
+		var result = rsa.setPublicKey(content[0]);
+
+		if ( !result ) {
+			return false;
+		}
+
+		if ( result.error ) {
+			setText('#result4-3', result.error);
+			setText('#result4-4', '-');
+			setText('#result4-5', '-');
+			return false;
+		}
+
+		setValue('#input4-3', result.e || '');
+		setText('#result4-3', result.d || '-');
+		setText('#result4-4', result.publicKey || '-');
+		setText('#result4-5', result.privateKey || '-');
 		
 	};
 
@@ -221,10 +265,8 @@
 			return false;			
 		}
 
-		// { d, publicKey, privateKey }
+		// { e d, publicKey, privateKey }
 		var result = rsa.getRandomPublicKey();
-
-		console.log(result);
 
 		setValue('#input4-3', result.e || '');
 		setText('#result4-3', result.d || '-');
@@ -233,6 +275,39 @@
 		
 	};
 
+	/* RSA 加密 */
+	$('#submit4-3').onclick = function() {
+
+		// 还没生成过 rsa 对象
+		if ( !rsa ) {
+			return false;			
+		}
+
+		// { e d, publicKey, privateKey }
+		var content = getText('#input4-3');
+
+		if ( !content[0] ) {
+			return false;
+		}
+
+		var _c = rsa.encrypt(content[0]);
+
+
+		setText('#result4-6', _c || '-');
+		
+	};
+
+
+
+
+
+	function resetPublicMsg() {
+		// 重置公钥相关信息
+		setValue('#input4-3', '');
+		setText('#result4-3', '-');
+		setText('#result4-4', '-');
+		setText('#result4-5', '-');
+	}
 	
 
 
@@ -805,12 +880,17 @@
 		    }
 		};
 
+		this.resetPublic = function() {
+			this.e = 0;
+			this.d = 0;
+		};
+
 		// 设置 p 与 q，并计算 n 与 $n，返回 [p, q, n, $n]
 		this.setPairPrimeNum = function(_p, _q) {
 
 			// 相等则不重复计算
 			if ( _p == this.p && _q == this.q ) {
-				return [_p, _q, this.n, this.$n];
+				return false;
 			}
 			
 			if ( _p < 2 || _q < 2 || !this.isPrime(_p) || !this.isPrime(_q) || _p === _q ) {
@@ -824,6 +904,9 @@
 
 			this.n = _p * _q;
 			this.$n = (_p - 1) * (_q - 1);
+
+			// 公钥重置
+			this.resetPublic();
 
 			return [_p, _q, this.n, this.$n];
 		};
@@ -877,7 +960,21 @@
 
 		// 设置公钥
 		this.setPublicKey = function(_e) {
+			
+			// 验证公钥
+			if ( _e < 2 || _e > this.$n || !this.isCoprime(_e, this.$n) ) {
+				return {
+					error: '公钥不符合条件',
+				}
+			}
+
+			// 当前公钥相同，且私钥已存在，则是重复按钮
+			if ( this.e === _e && this.d ) {
+				return false;
+			}
+
 			this.e = _e;
+
 			return this.getModInverse();
 		}
 
