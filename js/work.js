@@ -513,59 +513,6 @@ function RSA() {
 	this.e = 0;
 	this.d = 0;
 
-	// 工具函数，判断是否质数
-	this.isPrime = function(num) {
-		for (var i = 2; i <= Math.sqrt(num); i++) {
-			if ( num % i == 0 ) {
-				return false;
-			}
-		};
-		return true;
-	};
-
-	// 工具函数，获取指定范围内的随机数
-	this.getRandomNumInRange = function(range) {
-		// 0 ~ range
-		return Math.round(Math.random() * (range - 1));
-	};
-
-	// 工具函数，获取指定范围内的随机质数
-	this.getRandomPrimeNumInRange = function(range) {
-		var primeNumArr = [];
-		for(var i = 2; i <= range; i++) {
-			if ( this.isPrime(i) ) {
-				primeNumArr.push(i);
-			}
-		}
-		return primeNumArr[this.getRandomNumInRange(primeNumArr.length)];
-	};
-
-	// 工具函数，判断两个数是否互质
-	this.isCoprime = function(x, y) {  
-	    if ( x <= 0 || y <= 0 || x == y ) { // 非正整数都不存在互质的说法  
-	        return false;
-	    } else if ( x == 1 || y == 1 ) { // 1和任何正整数都互质  
-	        return true;  
-	    } else {
-	        var temp = 0;  
-	        //使用求商判断法，如果输入的x<y，第一次循环会交换x和y的位置  
-	        while (true) {  
-	            temp = x % y;  
-	            if ( temp == 0 ) {  
-	                break;  
-	            } else {
-	                x = y;
-	                y = temp;
-	            }  
-	        }  
-	        if( y == 1 ) { //最大公约数为1,所以互质           
-	            return true;
-	        } else { //最大公约数大于1，所以不互质  
-	        	return false;  
-	        }
-	    }
-	};
-
 	this.resetPublic = function() {
 		this.e = 0;
 		this.d = 0;
@@ -718,3 +665,56 @@ function RSA() {
 	return this;
 
 }
+
+// 工具函数，判断是否质数
+RSA.prototype.isPrime = function(num) {
+	for (var i = 2; i <= Math.sqrt(num); i++) {
+		if ( num % i == 0 ) {
+			return false;
+		}
+	};
+	return true;
+};
+
+// 工具函数，获取指定范围内的随机数
+RSA.prototype.getRandomNumInRange = function(range) {
+	// 0 ~ range
+	return Math.round(Math.random() * (range - 1));
+};
+
+// 工具函数，获取指定范围内的随机质数
+RSA.prototype.getRandomPrimeNumInRange = function(range) {
+	var primeNumArr = [];
+	for(var i = 2; i <= range; i++) {
+		if ( this.isPrime(i) ) {
+			primeNumArr.push(i);
+		}
+	}
+	return primeNumArr[this.getRandomNumInRange(primeNumArr.length)];
+};
+
+// 工具函数，判断两个数是否互质
+RSA.prototype.isCoprime = function(x, y) {  
+    if ( x <= 0 || y <= 0 || x == y ) { // 非正整数都不存在互质的说法  
+        return false;
+    } else if ( x == 1 || y == 1 ) { // 1和任何正整数都互质  
+        return true;  
+    } else {
+        var temp = 0;  
+        //使用求商判断法，如果输入的x<y，第一次循环会交换x和y的位置  
+        while (true) {  
+            temp = x % y;  
+            if ( temp == 0 ) {  
+                break;  
+            } else {
+                x = y;
+                y = temp;
+            }  
+        }  
+        if( y == 1 ) { //最大公约数为1,所以互质           
+            return true;
+        } else { //最大公约数大于1，所以不互质  
+        	return false;  
+        }
+    }
+};
