@@ -690,7 +690,7 @@ function RSA() {
 		}
 
 		// 返回密文 c
-		var _result = Math.pow(m, this.e) % this.n;
+		var _result = bigRat(m).pow(this.e).mod(this.n).num.value;
 		return isNaN(_result) ? '数据过大，暂不支持大数字加密，请换用更小的公钥' : _result;
 
 	}
@@ -705,12 +705,12 @@ function RSA() {
 		}
 
 		if ( n && d ) {
-			this.n = n;
-			this.d = d;
+			this.n = parseInt(n, 10);
+			this.d = parseInt(d, 10);
 		}
 
 		// 返回明文 m
-		var _result = Math.pow(c, this.d) % this.n;
+		var _result = bigRat(c).pow(this.d).mod(this.n).num.value;
 		return isNaN(_result) ? '数据过大，暂不支持大数字解密，可考虑换用其他公私钥' : _result;
 
 	}

@@ -209,7 +209,7 @@
 						<p class="label">私钥(n,d)：</p>
 						<pre class="result" id="result4-5">-</pre>
 						<p class="label">明文：</p>
-						<textarea class="form-text" rows="3" placeholder="输入需要加密的内容" id="input4-4"></textarea>
+						<textarea class="form-text" rows="3" placeholder="输入需要加密的内容（数字过大会导致失去精度，运算结果有误，浏览器短时间停顿）" id="input4-4"></textarea>
 						<button class="btn btn-default" id="submit4-3">生成密文</button>
 						<p class="label">密文：</p>
 						<pre class="result" id="result4-6">-</pre>
@@ -235,6 +235,8 @@
 
 		</div>
 	</div>
+
+	<script src="./js/BigRational.min.js"></script><!-- 用于大数据运算，原生JS进行大数据运算会不准确 -->
 	<script src="./js/sylvester.js"></script>
 	<script src="./js/work.js"></script>
 	<script src="./js/index.js"></script>
