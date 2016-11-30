@@ -296,10 +296,6 @@
 		
 	};
 
-
-
-
-
 	function resetPublicMsg() {
 		// 重置公钥相关信息
 		setValue('#input4-3', '');
@@ -308,6 +304,30 @@
 		setText('#result4-5', '-');
 		setText('#result4-6', '-');
 	}
+
+	/* RSA 解密 */
+	var rsa2;
+	$('#submit4-4').onclick = function() {
+
+		// 还没生成过 rsa 对象
+		if ( !rsa2 ) {
+			rsa2 = new RSA();		
+		}
+
+		var content = getText('#input4-5', '#input4-6', '#input4-7');
+
+		if ( !content[0] || !content[1] || !content[2] ) {
+			return false;
+		}
+
+		var _c = rsa2.decrypt(content[2], content[0], content[1]);
+
+		setText('#result4-7', _c || '-');
+
+		
+	};
+
+	
 	
 
 
@@ -1010,12 +1030,17 @@
 		}
 
 		// 解密：c^d ≡ m (mod n)
-		this.decrypt = function (c) {
+		this.decrypt = function (c, n, d) {
 
 			c = parseInt(c, 10);
 
 			if ( isNaN(c) ) {
 				return '密文不是数字';
+			}
+
+			if ( n && d ) {
+				this.n = n;
+				this.d = d;
 			}
 
 			// 返回明文 m
