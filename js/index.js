@@ -153,12 +153,6 @@
 		
 	};
 
-
-
-
-
-
-
 	function drawLetterMatrix(selector, letterMatrix) {
 		var $letterMatrix_ul = $(selector);
 
@@ -172,6 +166,75 @@
 
 		$letterMatrix_ul.innerHTML = _html;
 	}
+
+	var rsa;
+
+	/* RSA 使用该质数 */
+	$('#submit4-1-1').onclick = function() {
+
+		// 还没生成过 rsa 对象
+		if ( !rsa ) {
+			rsa = new RSA();
+		}
+
+		var content = getText('#input4-1', '#input4-2');  
+
+		// [p, q, n, $n]
+		var result = rsa.setPairPrimeNum(content[0], content[1]);
+
+		if (result.error) {
+			setText('#result4-1', result.error);
+			setText('#result4-2', '-');
+			return false;
+		}
+
+		setValue('#input4-1', result[0] || '');
+		setValue('#input4-2', result[1] || '');
+		setText('#result4-1', result[2] || '-');
+		setText('#result4-2', result[3] || '-');
+		
+	};
+
+	/* RSA 随机生成质数 */
+	$('#submit4-1-2').onclick = function() {
+
+		// 还没生成过 rsa 对象
+		if ( !rsa ) {
+			rsa = new RSA();
+		}
+
+		// [p, q, n, $n]
+		var result = rsa.getPairPrimeNum();
+
+		setValue('#input4-1', result[0] || '');
+		setValue('#input4-2', result[1] || '');
+		setText('#result4-1', result[2] || '-');
+		setText('#result4-2', result[3] || '-');
+		
+	};
+
+	/* RSA 随机生成公钥 */
+	$('#submit4-2-2').onclick = function() {
+
+		// 还没生成过 rsa 对象
+		if ( !rsa ) {
+			return false;			
+		}
+
+		// { d, publicKey, privateKey }
+		var result = rsa.getRandomPublicKey();
+
+		console.log(result);
+
+		setValue('#input4-3', result.e || '');
+		setText('#result4-3', result.d || '-');
+		setText('#result4-4', result.publicKey || '-');
+		setText('#result4-5', result.privateKey || '-');
+		
+	};
+
+	
+
 
 
 	/*
@@ -681,6 +744,15 @@
 	*/
 	function RSA() {
 
+		// 算法涉及的六个数
+		this.p = 0;
+		this.q = 0;
+		this.n = 0;
+		this.$n = 0;
+		this.e = 0;
+		this.d = 0;
+
+		// 工具函数，判断是否质数
 		this.isPrime = function(num) {
 			for (var i = 2; i <= Math.sqrt(num); i++) {
 				if ( num % i == 0 ) {
@@ -688,7 +760,172 @@
 				}
 			};
 			return true;
+		};
+
+		// 工具函数，获取指定范围内的随机数
+		this.getRandomNumInRange = function(range) {
+			// 0 ~ range
+			return Math.round(Math.random() * (range - 1));
+		};
+
+		// 工具函数，获取指定范围内的随机质数
+		this.getRandomPrimeNumInRange = function(range) {
+			var primeNumArr = [];
+			for(var i = 2; i <= range; i++) {
+				if ( this.isPrime(i) ) {
+					primeNumArr.push(i);
+				}
+			}
+			return primeNumArr[this.getRandomNumInRange(primeNumArr.length)];
+		};
+
+		// 工具函数，判断两个数是否互质
+		this.isCoprime = function(x, y) {  
+		    if ( x <= 0 || y <= 0 || x == y ) { // 非正整数都不存在互质的说法  
+		        return false;
+		    } else if ( x == 1 || y == 1 ) { // 1和任何正整数都互质  
+		        return true;  
+		    } else {
+		        var temp = 0;  
+		        //使用求商判断法，如果输入的x<y，第一次循环会交换x和y的位置  
+		        while (true) {  
+		            temp = x % y;  
+		            if ( temp == 0 ) {  
+		                break;  
+		            } else {
+		                x = y;
+		                y = temp;
+		            }  
+		        }  
+		        if( y == 1 ) { //最大公约数为1,所以互质           
+		            return true;
+		        } else { //最大公约数大于1，所以不互质  
+		        	return false;  
+		        }
+		    }
+		};
+
+		// 设置 p 与 q，并计算 n 与 $n，返回 [p, q, n, $n]
+		this.setPairPrimeNum = function(_p, _q) {
+
+			// 相等则不重复计算
+			if ( _p == this.p && _q == this.q ) {
+				return [_p, _q, this.n, this.$n];
+			}
+			
+			if ( _p < 2 || _q < 2 || !this.isPrime(_p) || !this.isPrime(_q) || _p === _q ) {
+				return {
+					error: 'p 与 q 不符合条件',
+				};
+			}
+
+			this.p = _p;
+			this.q = _q;
+
+			this.n = _p * _q;
+			this.$n = (_p - 1) * (_q - 1);
+
+			return [_p, _q, this.n, this.$n];
+		};
+
+		// 获取 p 与 q
+		this.getPairPrimeNum = function() {
+			var _range = 99; // 范围
+			var _p = this.getRandomPrimeNumInRange(_range),
+				_q = this.getRandomPrimeNumInRange(_range);
+
+			// 不相等
+			while ( _p === _q) {
+				_p = this.getRandomPrimeNumInRange(_range);
+				_q = this.getRandomPrimeNumInRange(_range)
+			}
+
+			return this.setPairPrimeNum(_p, _q);
+
+		};
+
+		// 设置私钥，返回 { e, d, publicKey, privateKey }
+		this.setPrivateKey = function(_d) {
+			this.d = _d;
+			var _that = this;
+			return {
+				e: _that.e,
+				d: _d,
+				publicKey: '(' + _that.n + ',' + _that.e + ')',
+				privateKey: '(' + _that.n + ',' + _that.d + ')',
+			};
+		};
+
+		// 蛮力法：ex + φ(n)y = 1，求解 x
+		// 已知 1 < e < $n
+		// 易知 x < $n , y < 0;
+		this.getModInverse = function() {
+			var _$n = this.$n;
+			var _e = this.e;
+			var _x, _y = -1;
+
+			while (true) {
+				for (_x = 1; _x < _$n; _x++) {
+					if ( _e * _x + _$n * _y == 1 ) {
+						return this.setPrivateKey(_x);
+					}
+				}
+				_y--;
+			}
+
 		}
+
+		// 设置公钥
+		this.setPublicKey = function(_e) {
+			this.e = _e;
+			return this.getModInverse();
+		}
+
+		// 随机生成符合条件的公钥 蛮力法，返回匹配的私钥 { e, d, publicKey, privateKey }
+		this.getRandomPublicKey = function() {
+			var eArr = [];
+			var _range = this.$n;
+
+			// 生成 1 < e < $n 的质数数组
+			for(var _e = 2; _e < _range; _e++) {
+				if ( this.isCoprime(_e, this.$n) ) { // e 与 $n 互质
+					eArr.push(_e);
+				}
+			}
+
+			return this.setPublicKey(eArr[this.getRandomNumInRange(eArr.length)]);
+
+		};
+
+		// 加密：m^e ≡ c (mod n)
+		this.encrypt = function(m) {
+
+			m = parseInt(m, 10);
+
+			if ( isNaN(m) ) {
+				return '明文不是数字';
+			}
+
+			// 返回密文 c
+			return Math.pow(m, this.e) % this.n;
+
+		}
+
+		// 解密：c^d ≡ m (mod n)
+		this.decrypt = function (c) {
+
+			c = parseInt(c, 10);
+
+			if ( isNaN(c) ) {
+				return '密文不是数字';
+			}
+
+			// 返回明文 m
+			return Math.pow(c, this.d) % this.n;
+
+		}
+
+		return this;
 
 	}
 
@@ -729,6 +966,15 @@
 	*/
 	function setText(selector, text) {
 		$(selector).innerText = text;
+	}
+
+	/*
+		@description 用于输出文本至特定输入框
+		@param { selector String } selector 对应输入框选择器
+		@param { String } text 文本内容
+	*/
+	function setValue(selector, text) {
+		$(selector).value = text;
 	}
 
 
