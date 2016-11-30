@@ -283,8 +283,7 @@
 			return false;			
 		}
 
-		// { e d, publicKey, privateKey }
-		var content = getText('#input4-3');
+		var content = getText('#input4-4');
 
 		if ( !content[0] ) {
 			return false;
@@ -307,6 +306,7 @@
 		setText('#result4-3', '-');
 		setText('#result4-4', '-');
 		setText('#result4-5', '-');
+		setText('#result4-6', '-');
 	}
 	
 
@@ -1004,7 +1004,8 @@
 			}
 
 			// 返回密文 c
-			return Math.pow(m, this.e) % this.n;
+			var _result = Math.pow(m, this.e) % this.n;
+			return isNaN(_result) ? '数据过大，暂不支持大数字加密，请换用更小的公钥' : _result;
 
 		}
 
@@ -1018,7 +1019,8 @@
 			}
 
 			// 返回明文 m
-			return Math.pow(c, this.d) % this.n;
+			var _result = Math.pow(c, this.d) % this.n;
+			return isNaN(_result) ? '数据过大，暂不支持大数字解密，可考虑换用其他公私钥' : _result;
 
 		}
 
